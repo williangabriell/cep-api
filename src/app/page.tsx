@@ -5,6 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { MdDelete } from "react-icons/md";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const inititalEnderecos: Address[] = [
   {
     id: self.crypto.randomUUID(),
@@ -121,6 +122,7 @@ function formatDate(date: Date) {
 }
 
 export default function Home() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [address, setAddress] = useState(null);
   const [loading, setLoading] = useState(false);
 
