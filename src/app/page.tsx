@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getAddress } from "../../get-address";
 import { formatDistanceToNow } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -8,7 +8,7 @@ import { MdDelete } from "react-icons/md";
 const inititalEnderecos: Address[] = [
   {
     id: self.crypto.randomUUID(),
-    cep: "51270-380",
+    cep: "51270380",
     logradouro: "Rua Engenho Carau",
     complemento: "",
     unidade: "1",
@@ -25,7 +25,7 @@ const inititalEnderecos: Address[] = [
   },
   {
     id: self.crypto.randomUUID(),
-    cep: "30130-010",
+    cep: "30130010",
     logradouro: "Avenida Afonso Pena",
     complemento: "",
     unidade: "2",
@@ -42,7 +42,7 @@ const inititalEnderecos: Address[] = [
   },
   {
     id: self.crypto.randomUUID(),
-    cep: "01310-000",
+    cep: "01310000",
     logradouro: "Avenida Paulista",
     complemento: "",
     unidade: "3",
@@ -59,7 +59,7 @@ const inititalEnderecos: Address[] = [
   },
   {
     id: self.crypto.randomUUID(),
-    cep: "40020-000",
+    cep: "40020000",
     logradouro: "Praça da Sé",
     complemento: "Edifício Central",
     unidade: "4",
@@ -76,7 +76,7 @@ const inititalEnderecos: Address[] = [
   },
   {
     id: self.crypto.randomUUID(),
-    cep: "70040-900",
+    cep: "70040900",
     logradouro: "Esplanada dos Ministérios",
     complemento: "",
     unidade: "5",
@@ -124,7 +124,7 @@ export default function Home() {
   const [address, setAddress] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const [enderecos, setEnderecos] = useState<Address[]>(inititalEnderecos);
+  const [enderecos, setEnderecos] = useState<Address[] | null>(null);
 
   const [inputValue, setInputValue] = useState("");
 
@@ -150,7 +150,7 @@ export default function Home() {
 
       console.log(newEndereco);
 
-      setEnderecos([newEndereco, ...enderecos]);
+      setEnderecos([newEndereco].concat(enderecos ? enderecos : []));
     } catch (error) {
       console.log(error);
       alert("Ocorreu um erro ao obter o endereço.");
@@ -168,13 +168,31 @@ export default function Home() {
     setEnderecos(filteredAddresses);
   }
 
+  useEffect(() => {
+    const result = localStorage.getItem("@addresses");
+
+    if (result === null) return;
+
+    setEnderecos(JSON.parse(result));
+  }, []);
+
+  useEffect(() => {
+    if (enderecos === null) return;
+
+    localStorage.setItem("@addresses", JSON.stringify(enderecos));
+  }, [enderecos]);
+
   return (
-    <div className="flex flex-col gap-4 px-56 mt-24">
+
+      <div className="flex flex-col gap-4 px-56">
+
+      <h1 className="flex gap-4 px-48 mt-12 text-white">BUSCADOR DE CEPS</h1>
+
       <div className="flex px-64 gap-2">
         <input
           onChange={(event) => setInputValue(event.target.value)}
           placeholder="Digite o CEP aqui"
-          className="flex flex-1 rounded-md border border-black px-4 p-3"
+          className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         />
 
         <button
@@ -182,34 +200,34 @@ export default function Home() {
           onClick={handleGetAddress}
           className={`${
             loading && "opacity-30"
-          } w-fit px-5 py-3 bg-blue-700 text-white rounded-xl`}
+          } w-full scroll-px-0 py-2 bg-blue-700 text-white rounded-xl`}
         >
           {loading ? "Carregando..." : "Obter endereço"}
         </button>
       </div>
 
-      <table>
-        <thead>
+      <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
           <tr>
-            <th>Logradouro</th>
-            <th>Bairro</th>
-            <th>Cidade</th>
-            <th>Estado</th>
-            <th>CEP</th>
-            <th>Consultado em</th>
-            <th>Ações</th>
+            <th className="px-6 py-3">Logradouro</th>
+            <th className="px-6 py-3">Bairro</th>
+            <th className="px-6 py-3">Cidade</th>
+            <th className="px-6 py-3">Estado</th>
+            <th className="px-6 py-3">CEP</th>
+            <th className="px-6 py-3">Consultado em</th>
+            <th className="px-6 py-3">Ações</th>
           </tr>
         </thead>
 
         <tbody>
-          {enderecos.map((endereco) => (
-            <tr key={endereco.id} className="border-2 [&>*]:py-2 [&>*]:px-2">
-              <td>{endereco.logradouro}</td>
-              <td>{endereco.bairro}</td>
-              <td>{endereco.localidade}</td>
-              <td>{endereco.uf}</td>
-              <td>{endereco.cep}</td>
-              <td>{formatDate(endereco.createdAt)}</td>
+          {enderecos?.map((endereco) => (
+            <tr key={endereco.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+              <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{endereco.logradouro}</td>
+              <td className="px-6 py-3">{endereco.bairro}</td>
+              <td className="px-6 py-3">{endereco.localidade}</td>
+              <td className="px-6 py-3">{endereco.uf}</td>
+              <td className="px-6 py-3">{endereco.cep}</td>
+              <td className="px-6 py-3">{formatDate(endereco.createdAt)}</td>
               <td className="flex">
                 <button
                   onClick={() => handleDeleteAddress(endereco.id)}
