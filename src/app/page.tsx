@@ -163,10 +163,10 @@ export default function Home() {
 
   function handleDeleteAddress(id: string) {
     console.log(id);
-    const filteredAddresses = enderecos.filter(
+    const filteredAddresses = (enderecos ?? []).filter(
       (endereco) => endereco.id !== id
     );
-
+  
     setEnderecos(filteredAddresses);
   }
 
